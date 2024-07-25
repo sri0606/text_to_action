@@ -1,0 +1,18 @@
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "text_to_action"
+version = "1.0.0"
+license = "MIT"
+description = "A system that translates natural language queries into programmatic actions"
+readme = "README.md"
+authors = ["Sriram Seelamneni <srirams0606@gmail.com>"]
+repository = "https://github.com/sri0606/text_to_action"
+classifiers = [
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+]
+keywords = ["text_to_action", "function calling", "natural language processing"]

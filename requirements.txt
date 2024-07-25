@@ -1,0 +1,14 @@
+deepdiff
+groq
+h5py
+matplotlib
+numpy
+openai
+pydantic
+python-dotenv
+python_dateutil
+scipy
+sentence-transformers
+spacy
+torch
+transformers
