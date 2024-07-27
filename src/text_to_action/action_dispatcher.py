@@ -29,7 +29,7 @@ class ActionDispatcher:
         """
         Parameters:
         action_embedding_filename : The path to the vector store. All embedding files are located in /action_embeddings dir (Example: calculator.h5)
-        actions_filepath : The path to the py file where functions/actions are defined.
+        actions_filepath : The path to the py file where functions/actions are defined. You can leave it as None if you defined functions in other languages (like calculator.cpp) and just get_arguments
         llm_api : The LLM API to use. (Default: LLM_API.GROQ)
         llm_model : The LLM model to use. (Default: llama3-70b-8192)
         use_llm_extract_parameters : Whether to use LLM to extract all parameters. (Default: False)
@@ -43,7 +43,7 @@ class ActionDispatcher:
         self.llm_client = LLMClient(llm_api,llm_model)
         self.parameter_extractor = LLMParameterExtractor(self.llm_client) if use_llm_extract_parameters else NERParameterExtractor(spacy_model_ner,self.llm_client)
 
-        self.actions_module = load_module_from_path(actions_filepath)
+        self.actions_module = load_module_from_path(actions_filepath) if actions_filepath is not None else None
         
         Config.set_verbose(verbose_output)
 
@@ -56,16 +56,57 @@ class ActionDispatcher:
         except Exception as e:
             print(f"Error executing function: {e}")
             return None
-        
+    
+    def extract_functions(self, query_text, top_k=1, threshold=0.45):
+        """
+        Get top matched functions.
+        **This doesnt actually execute the function. It just returns the list of top ranked function.**
+
+        Args:
+            query_text : The text input.
+            top_k : The number of top-ranked actions to consider. (Default: 1)
+            threshold : The threshold value for function selection. (Default: 0.45)
+
+        Returns : The extracted functions.
+        """
+        possible_actions = self.embeddings_store.query(query_text, k=top_k)
+        results = []
+        for action in possible_actions:
+            if action[1] > threshold:
+                results.append(action[0].id_name)
+        return results
+
+    def extract_parameters(self, query_text, functions_args_description:Dict[str,Dict[str,Any]]):
+        """
+        Get the parameters for the function to be called.
+
+        Args:
+            query_text : The text input.
+            functions_args_description : A dictionary containing the function name and its arguments with descriptions
+            .
+        Returns: results : The extracted parameters for the function.
+        """
+        self.parameter_extractor.clear()
+
+        results = {}
+
+        for function_name, arguments in functions_args_description.items():
+                results[function_name] = self.parameter_extractor.extract_parameters(query_text, function_name,arguments)
+                break
+
+        return results
     def dispatch(self, query_text,*args, **kwargs):
         """
         Dispatch the task to the appropriate functions.
+        Extracts parameters and executes the function.
 
         Args:
             text : The text input.
 
         Returns: results : The results of the function calls.
         """
+        if self.actions_module is None:
+            raise Exception("Actions module is not loaded. Please make sure to provide a value for actions_filepath")
         possible_actions = self.embeddings_store.query(query_text,k=5)
 
         self.parameter_extractor.clear()

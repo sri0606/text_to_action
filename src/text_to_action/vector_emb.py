@@ -167,9 +167,14 @@ class VectorStore:
         Saves the vectors to a file.
 
         Args:
-            filename (str): The name of the file to save the vectors to.
+            filename (str): The filepath or name of the file to save the vectors to.
         """
-        with h5py.File(os.path.join(EMBEDDINGS_DIR,filename), 'w') as f:
+        if os.path.isabs(filename):
+            file_path = filename
+        else:
+            file_path = os.path.join(EMBEDDINGS_DIR, filename)
+
+        with h5py.File(file_path, 'w') as f:
             for key, vector_node in self.vector_nodes.items():
                 # Serialize the value to a byte string and encode it to base64 (to avoid NULL errors) )
                 serialized_value = base64.b64encode(pickle.dumps(vector_node.to_dict()))
@@ -180,9 +185,14 @@ class VectorStore:
         Loads the vectors from a file.
 
         Args:
-            filename (str): The name of the file to load the vectors from.
+            filename (str): The name of the file to load the vectors from or the full path to the file.
         """
-        with h5py.File(os.path.join(EMBEDDINGS_DIR,filename), 'r') as f:
+        if os.path.isabs(filename):
+            file_path = filename
+        else:
+            file_path = os.path.join(EMBEDDINGS_DIR, filename)
+
+        with h5py.File(file_path, 'r') as f:
             for key in f.keys():
                 # Decode the value from base64 and deserialize it from a byte string
                 data = pickle.loads(base64.b64decode(f[key][()]))

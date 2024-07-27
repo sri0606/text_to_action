@@ -207,61 +207,69 @@ def llm_map_pydantic_parameters(text: str, function_name: str, param_description
     return result
 
 
-def llm_extract_all_parameters(function_name, query_text,llm_client:LLMClient):
+def llm_extract_all_parameters(function_name, query_text,llm_client:LLMClient,args_dict=None):
     """
     Extract all parameters for a given function using an LLM and map them to correct kwargs.
     
     Args:
         function_name: The function for which to extract parameters.
         query_text: The input text to analyze for parameter extraction.
-
+        args_dict: A dictionary mapping parameter names to their types/descriptions. If None, the function signature is used.
     Returns:
         A JSON string containing the extracted parameters mapped to their correct kwargs.
     """
-    # Get the signature of the function
-    sig = inspect.signature(function_name)
 
-    param_dict = {}
-    type_descriptions = {}
+    if args_dict is None:
+        # Get the signature of the function
+        sig = inspect.signature(function_name)
+        param_dict = {}
+        type_descriptions = {}
 
-    for param_name, param in sig.parameters.items():
-        param_type = param.annotation
-        if hasattr(param_type, '__origin__') and param_type.__origin__ is list:
-            inner_type = get_args(param_type)[0]
-            type_name = f"List[{inner_type.__name__}]"
-            param_dict[param_name] = type_name
-            if issubclass(inner_type, BaseModel):
-                field_descriptions = {field: field_info.description for field, field_info in inner_type.model_fields.items()}
+        for param_name, param in sig.parameters.items():
+            param_type = param.annotation
+            if hasattr(param_type, '__origin__') and param_type.__origin__ is list:
+                inner_type = get_args(param_type)[0]
+                type_name = f"List[{inner_type.__name__}]"
+                param_dict[param_name] = type_name
+                if issubclass(inner_type, BaseModel):
+                    field_descriptions = {field: field_info.description for field, field_info in inner_type.model_fields.items()}
+                    type_descriptions[type_name] = {
+                        "description": f"A list of {inner_type.__name__} objects",
+                        "fields": field_descriptions
+                    }
+                else:
+                    type_descriptions[type_name] = {
+                        "description": f"A list of {inner_type.__name__} values"
+                    }
+            elif issubclass(param_type, BaseModel):
+                type_name = param_type.__name__
+                param_dict[param_name] = type_name
+                field_descriptions = {field: field_info.description for field, field_info in param_type.model_fields.items()}
                 type_descriptions[type_name] = {
-                    "description": f"A list of {inner_type.__name__} objects",
+                    "description": param_type.description,
                     "fields": field_descriptions
                 }
             else:
+                type_name = param_type.__name__
+                param_dict[param_name] = type_name
                 type_descriptions[type_name] = {
-                    "description": f"A list of {inner_type.__name__} values"
+                    "description": f"A single {type_name} value"
                 }
-        elif issubclass(param_type, BaseModel):
-            type_name = param_type.__name__
-            param_dict[param_name] = type_name
-            field_descriptions = {field: field_info.description for field, field_info in param_type.model_fields.items()}
-            type_descriptions[type_name] = {
-                "description": param_type.description,
-                "fields": field_descriptions
-            }
-        else:
-            type_name = param_type.__name__
-            param_dict[param_name] = type_name
-            type_descriptions[type_name] = {
-                "description": f"A single {type_name} value"
-            }
 
-    prompt = f"""
-    Analyze the following text to extract parameters for the function "{function_name.__name__}".
-    The function takes the following parameters:
+    if args_dict is None:
+        prompt_intro = f"""Analyze the following text to extract parameters for the function "{function_name.__name__}".
+        The function takes the following parameters:
         {json.dumps(param_dict, indent=2)}
 
-    Where each parameter type description is as follows:
-        {json.dumps(type_descriptions, indent=2)}
+        Where each parameter type description is as follows:
+            {json.dumps(type_descriptions, indent=2)}"""
+    else:
+        prompt_intro = f"""Analyze the following text to extract parameters for the function "{function_name}".
+        The function takes the following parameters:
+        {json.dumps(args_dict, indent=2)}"""
+
+    prompt = f"""
+    {prompt_intro}
 
     Text to analyze:
     "{query_text}"
@@ -287,6 +295,10 @@ def llm_extract_all_parameters(function_name, query_text,llm_client:LLMClient):
     try:
         json_obj = llm_response.split("```")[1].strip()
         extracted_params = json.loads(json_obj)
+
+        if args_dict is not None:
+            return extracted_params
+        
     except json.JSONDecodeError:
         print("Error: LLM response is not valid JSON")
         return "{}"

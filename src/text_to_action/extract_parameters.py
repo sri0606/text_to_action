@@ -12,7 +12,8 @@ class ParameterExtractor(ABC):
         self.llm_client = llm_client
 
     @abstractmethod
-    def extract_parameters(self, query_text: str, function_name: callable) -> Dict[str, Any]:
+    def extract_parameters(self, query_text: str, function_name: Union[callable,str]) -> Dict[str, Any]:
+
         pass
 
     def clear(self):
@@ -46,7 +47,7 @@ class NERParameterExtractor(ParameterExtractor):
                         instance = class_obj(value)
                     self.entities[entity_type] = [instance] if entity_type not in self.entities else self.entities[entity_type] + [instance]
     
-    def extract_parameters(self, query_text: str, function_name: callable) -> Dict[str, Any]:
+    def extract_parameters(self, query_text: str, function_name: Union[callable,str]) -> Dict[str, Any]:
         """
         Return extracted args from the query text using NER (and LLM if any params are missing).
         """
@@ -128,5 +129,15 @@ class NERParameterExtractor(ParameterExtractor):
     
 class LLMParameterExtractor(ParameterExtractor):
 
-    def extract_parameters(self, query_text: str, function_name: callable) -> Dict[str, Any]:
-        return llm_extract_all_parameters(function_name, query_text,self.llm_client)
+    def extract_parameters(self, query_text: str, function_name: Union[callable,str],arguments_dict:Dict[str,Dict[str,Any]]=None) -> Dict[str, Any]:
+        """
+        Extract all parameters for a given function using an LLM and map them to correct kwargs.
+    
+        Args:
+            function_name: The function for which to extract parameters.
+            query_text: The input text to analyze for parameter extraction.
+            args_dict: A dictionary mapping parameter names to their types/descriptions. If None, the function signature is used.
+        Returns:
+            A JSON string containing the extracted parameters mapped to their correct kwargs.
+        """
+        return llm_extract_all_parameters(function_name, query_text,self.llm_client,args_dict=arguments_dict)
