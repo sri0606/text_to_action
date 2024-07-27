@@ -14,6 +14,8 @@ Below is a simple example:
 
 ```python
 from text_to_action import ActionDispatcher
+from dotenv import load_dotenv
+load_dotenv()
 
 action_file = "text_to_action/src/text_to_action/actions/calculator.py"
 dispatcher = ActionDispatcher(action_embedding_filename="calculator.h5",actions_filepath=action_file,
@@ -29,7 +31,17 @@ while True:
     print('\n')
 ```
 
-### Creating actions
+### Quick Notes:
+
+- Get an API keyfrom services like Groq (free-tier available) or OpenAI. Create a `.env` file and set the api keys values to either `GROQ_API_KEY` or `OPENAI_API_KEY`.
+
+- If you are using NER for parameters extraction, download the corresponding model from spacy.
+
+  ```
+  python -m spacy download en_core_web_trf
+  ```
+
+## Creating actions
 
 - First, create a list of actions descriptions in the following format:
 
@@ -49,18 +61,17 @@ while True:
 - Then, you can create embeddings for functions using the following:
 
   ```python
-    from text_to_action import create_action_embeddings
-    from text_to_action.types import ModelSource
+  from text_to_action import create_action_embeddings
+  from text_to_action.types import ModelSource
 
-    # you can use SBERT or other huggingface models to create embeddings
-    create_actions_embeddings(functions_description, save_filename="calculator.h5",
-                                embedding_model="all-MiniLM-L6-v2",model_source=ModelSource.SBERT)
+  # you can use SBERT or other huggingface models to create embeddings
+  create_actions_embeddings(functions_description, save_filename="calculator.h5",
+                              embedding_model="all-MiniLM-L6-v2",model_source=ModelSource.SBERT)
   ```
 
 - Finally, define the necessary functions and save them to a file. Use the types defined in [entity_models](src/text_to_action/entity_models.py) for function parameter types, or create additional types as needed for data validation and to ensure type safety and clarity in your code.
 
   ```python
-
   from typing import List
   from text_to_action.entity_models import CARDINAL
 
@@ -81,6 +92,8 @@ You can tehn use created actions:
 
 ```python
 from text_to_action import ActionDispatcher
+from dotenv import load_dotenv
+load_dotenv()
 
 # use the same embedding model, model source you used when creating the actions embeddings
 # actions_filepath is where the functions are defined

@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "text_to_action"
-version = "1.0.1"
+version = "1.0.2"
 license = "MIT"
 description = "A system that translates natural language queries into programmatic actions"
 readme = "README.md"
