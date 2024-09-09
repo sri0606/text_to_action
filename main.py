@@ -4,7 +4,7 @@ if __name__ == '__main__':
 
     action_file = "src/text_to_action/actions/calculator.py"
     dispatcher = ActionDispatcher(action_embedding_filename="calculator.h5",actions_filepath=action_file,
-                                  use_llm_extract_parameters=True,verbose_output=True)
+                                  use_llm_extract_parameters=True,verbose_output=True,llm_model = "llama3-8b-8192")
 
     while True:
         user_input = input("Enter your query: ")

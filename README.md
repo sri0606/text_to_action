@@ -61,7 +61,7 @@ while True:
 - Then, you can create embeddings for functions using the following:
 
   ```python
-  from text_to_action import create_action_embeddings
+  from text_to_action.create_actions import create_action_embeddings
   from text_to_action.types import ModelSource
 
   # you can use SBERT or other huggingface models to create embeddings
