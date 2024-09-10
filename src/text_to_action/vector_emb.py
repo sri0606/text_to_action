@@ -174,6 +174,7 @@ class VectorStore:
         else:
             file_path = os.path.join(EMBEDDINGS_DIR, filename)
 
+        print("Saving the file to: " + file_path)
         with h5py.File(file_path, 'w') as f:
             for key, vector_node in self.vector_nodes.items():
                 # Serialize the value to a byte string and encode it to base64 (to avoid NULL errors) )

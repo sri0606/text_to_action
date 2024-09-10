@@ -91,7 +91,8 @@ class ActionDispatcher:
         results = {}
 
         for function_name, arguments in functions_args_description.items():
-                results[function_name] = self.parameter_extractor.extract_parameters(query_text, function_name,arguments)
+                results[function_name] = self.parameter_extractor.extract_parameters(query_text=query_text, 
+                                                                                     function_name=function_name,arguments_dict=arguments)
                 break
 
         return results

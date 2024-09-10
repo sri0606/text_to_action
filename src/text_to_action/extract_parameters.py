@@ -112,8 +112,9 @@ class NERParameterExtractor(ParameterExtractor):
             # We need to use llm_map_pydantic_parameters
             verbose_print(f"Mapping parameters to correct kwarg using llm: {extracted_parameters}")
             param_descriptions = ", ".join([f"{name} ({param.annotation.__name__})" for name, param in sig.parameters.items()])
-            mapped_params = llm_map_pydantic_parameters(query_text, function_name.__name__, 
-                                                        param_descriptions, extracted_parameters, self.llm_client)
+            mapped_params = llm_map_pydantic_parameters(text=query_text,function_name= function_name.__name__, 
+                                                        param_descriptions=param_descriptions, extracted_parameters=extracted_parameters, 
+                                                        llm_client=self.llm_client)
 
             verbose_print(f"param  mapping: {mapped_params}")
             for name, param in sig.parameters.items():
@@ -140,4 +141,5 @@ class LLMParameterExtractor(ParameterExtractor):
         Returns:
             A JSON string containing the extracted parameters mapped to their correct kwargs.
         """
-        return llm_extract_all_parameters(function_name, query_text,self.llm_client,args_dict=arguments_dict)
+        return llm_extract_all_parameters(function_name=function_name, query_text=query_text,
+                                          llm_client=self.llm_client,args_dict=arguments_dict)

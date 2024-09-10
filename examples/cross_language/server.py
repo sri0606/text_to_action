@@ -2,7 +2,7 @@ from fastapi import FastAPI,Body
 from typing import Any,Optional
 from pydantic import BaseModel
 import json
-from src.text_to_action import ActionDispatcher
+from text_to_action import ActionDispatcher
 from dotenv import load_dotenv
 load_dotenv()
 
