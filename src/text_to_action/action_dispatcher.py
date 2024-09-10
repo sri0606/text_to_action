@@ -72,7 +72,7 @@ class ActionDispatcher:
         possible_actions = self.embeddings_store.query(query_text, k=top_k)
         results = []
         for action in possible_actions:
-            if action[1] > threshold:
+            if action[1] > threshold and action[0].id_name not in results:
                 results.append(action[0].id_name)
         return results
 
