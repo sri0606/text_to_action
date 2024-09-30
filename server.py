@@ -1,4 +1,4 @@
-from fastapi import FastAPI,Body
+from fastapi import FastAPI
 from typing import Any,Optional, Dict
 from pydantic import BaseModel
 import json
@@ -20,7 +20,7 @@ class ArgumentsRequest(BaseModel):
 
 app = FastAPI()
 
-llm_client = LLMClient(model="groq/mixtral-8x7b-32768")
+llm_client = LLMClient(model="groq/llama3-70b-8192")
 current_directory = os.path.dirname(os.path.abspath(__file__))
 calculator_actions_folder = os.path.join(current_directory,"src","text_to_action","example_actions","calculator")
 
@@ -41,7 +41,7 @@ async def extract_arguments(request:ArgumentsRequest):
     return json.dumps(result)
          
 @app.post("/extract_actions_with_args")
-async def extract(request:FunctionsRequest):
+async def extract_actions_with_args(request:FunctionsRequest):
     result =  dispatcher.extract_actions_with_args(query_text=request.text,
                                     top_k=request.top_k,threshold=request.threshold)
 

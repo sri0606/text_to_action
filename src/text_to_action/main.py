@@ -158,8 +158,8 @@ class TextToAction:
 
         # response_format= { "type": "json_schema", "json_schema": {"actions":'List',"message":str} , "strict": True }
         response = self.llm_client.get_direct_response(messages=[{"role":"system","content":system_message},{"role":"user","content":query_text}])
-
         format_response = extract_json_from_response(response)
+        verbose_print("Filtered query:", format_response)
         return format_response
     
     def execute_action(self,action_name: Union[callable, str], extracted_parameters: Dict[str, Any]) -> Any:
@@ -194,10 +194,17 @@ class TextToAction:
                 - "message" (str): A message describing the status of the action extraction.
         """
         possible_actions = []
+        actions = []
         message = ""
+
+        if len(query_text.strip())==0:
+            return {"actions": actions, "message": "Empty text cannot be processed."}
+
         if self.filter_input:
             response = self.filter_user_query(query_text)
-            if len(response["actions"])==0:
+            if response is None:
+                possible_actions.extend(self.embeddings_store.query(query_text, k=top_k))
+            elif len(response["actions"])==0:
                 return response
             else:
                 for query in response["actions"]:
@@ -205,12 +212,12 @@ class TextToAction:
         else:
             possible_actions.extend(self.embeddings_store.query(query_text, k=top_k))
 
-        actions = []
+        
         for action in possible_actions:
             if action[1] > threshold and action[0].id_name not in actions:
                 actions.append(action[0].id_name)
 
-        if self.filter_input:
+        if self.filter_input and response is not None:
             message = response["message"]
         else:
             message = "Actions detected." if len(possible_actions) > 0 else "Sorry I cannot help you with that. No actions were detected."
