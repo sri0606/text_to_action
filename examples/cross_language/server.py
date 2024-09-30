@@ -1,10 +1,12 @@
-from fastapi import FastAPI,Body
-from typing import Any,Optional
+from fastapi import FastAPI
+from typing import Any,Optional, Dict
 from pydantic import BaseModel
 import json
-from text_to_action import ActionDispatcher
+import os
+from src.text_to_action import TextToAction, LLMClient
 from dotenv import load_dotenv
 load_dotenv()
+
 
 class FunctionsRequest(BaseModel):
     text: str
@@ -13,38 +15,44 @@ class FunctionsRequest(BaseModel):
 
 class ArgumentsRequest(BaseModel):
     text: str
-    functions_args_dict:Any = Body(...)
+    action_name: str
+    args: Dict[str,Dict[str,Any]]
 
 app = FastAPI()
 
-dispatcher = ActionDispatcher(action_embedding_filename="calculator.h5",actions_filepath=None,
-                                use_llm_extract_parameters=True,verbose_output=True)
+llm_client = LLMClient(model="groq/llama3-70b-8192")
+current_directory = os.path.dirname(os.path.abspath(__file__))
+calculator_actions_folder = os.path.join(current_directory,"src","text_to_action","example_actions","calculator")
 
+dispatcher = TextToAction(actions_folder = calculator_actions_folder, llm_client=llm_client,
+                            verbose_output=True,application_context="Calculator", filter_input=True)
 
-@app.post("/extract_functions")
-async def extract_functions(request:FunctionsRequest):
-    return dispatcher.extract_functions(query_text=request.text,
+@app.post("/extract_actions")
+async def extract_actions(request:FunctionsRequest):
+    result =  dispatcher.extract_actions(query_text=request.text,
                                     top_k=request.top_k,threshold=request.threshold)
+
+    return json.dumps(result)
 
 @app.post("/extract_arguments")
 async def extract_arguments(request:ArgumentsRequest):
+    result = dispatcher.extract_parameters(query_text=request.text, action_name=request.action_name, args = request.args)
 
-    if isinstance(request.functions_args_dict, str):
-        try:
-            functions_args_dict = json.loads(request.functions_args_dict)
-        except json.JSONDecodeError:
-            return {"error": "Invalid JSON for functions_args_dict"}
-    else:
-        functions_args_dict = request.functions_args_dict
-    
-    if isinstance(functions_args_dict, dict):
-        return dispatcher.extract_parameters(query_text=request.text,
-                                         functions_args_description=functions_args_dict
-                                    )
-    else:
-        return json.dumps(dispatcher.extract_parameters(query_text=request.text,
-                                            functions_args_description=functions_args_dict
-                                        ))
+    return json.dumps(result)
+         
+@app.post("/extract_actions_with_args")
+async def extract_actions_with_args(request:FunctionsRequest):
+    result =  dispatcher.extract_actions_with_args(query_text=request.text,
+                                    top_k=request.top_k,threshold=request.threshold)
+
+    return json.dumps(result)
+
+@app.post("/run")
+async def run( request:FunctionsRequest):
+    result =  dispatcher.run(query_text=request.text,
+                                    top_k=request.top_k,threshold=request.threshold)
+
+    return json.dumps(result)
 
 if __name__ == "__main__":
     import uvicorn

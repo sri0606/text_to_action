@@ -23,13 +23,9 @@ This is just a simple demonstration for how to use the `text_to_action` with fun
   - Javascript
 
   ```
+  npm install axios
   node main.js
   ```
 
-  - Golang
-
-  ```
-  go run main.go
-  ```
 
 Feel free to add your own examples with other languages and submit a pull request :)

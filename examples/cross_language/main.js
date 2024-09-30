@@ -1,90 +1,122 @@
 const axios = require('axios');
 
-// Example functions
-const addFunc = (a, b) => a + b;
-const subtractFunc = (a, b) => a - b;
-const multiplyFunc = (a, b) => a * b;
-const divideFunc = (a, b) => a / b;
+class CalculatorInstance {
+  constructor() {}
 
-const functionMap = {
-  "add": addFunc,
-  "subtract": subtractFunc,
-  "multiply": multiplyFunc,
-  "divide": divideFunc,
-};
-
-function buildFunctionsArgsDict(func_obj, functionName) {
-  const argsDict = {};
-  const funcStr = func_obj.toString();
-  const argsRegex = /\(([^)]+)\)/;
-  const argsMatch = argsRegex.exec(funcStr);
-  if (argsMatch) {
-    const args = argsMatch[1].split(',').map(arg => arg.trim());
-    args.forEach((arg, index) => {
-      argsDict[arg] = "int";
-    });
+  add(items) {
+    return items.reduce((sum, item) => sum + Number(item), 0);
   }
-  return {[functionName]: argsDict};
+
+  subtract(a, b) {
+    return Number(a) - Number(b);
+  }
+
+  multiply(items) {
+    return items.reduce((product, item) => product * Number(item), 1);
+  }
+
+  divide(a, b) {
+    if (Number(b) === 0) {
+      throw new Error("Cannot divide by zero");
+    }
+    return Number(a) / Number(b);
+  }
 }
 
+const calculatorInstance = new CalculatorInstance();
 
-async function extractAndExecute(userInput, functionMap) {
+async function runExtraction(userInput){
+      // Send a request to the server to extract functions and their arguments
+    const extractFunctionsResponse = await axios.post('http://localhost:8000/extract_actions_with_args', {
+      text: userInput,
+      top_k: 1,
+      threshold: 0.45,
+    });
+    // Extract the function and its arguments from the response
+    const result = JSON.parse(extractFunctionsResponse.data);
+    return result;
+}
+
+async function runExecution(extractionResults) {
+  let results = [];
+
   try {
-    // Extract functions
-    const extractFunctionsResponse = await axios.post('http://localhost:8000/extract_functions', {
-        text: userInput,
-        top_k: 1,
-        threshold: 0.45,
-      },
-    );
+    const actions = extractionResults.actions; // Array of actions
 
-    const extractedFunctions = extractFunctionsResponse.data;
-    console.log('Functions extraction response:', extractedFunctions);
+    for (const action of actions) {
+      const functionName = action.action; // e.g., "add", "resize_video"
+      const functionArgs = action.args; // e.g., {values: [3, 4]} or {width: 480, height: 720}
 
-    // Extract arguments and execute each function
-    for (const functionName of extractedFunctions) {
-      if (functionMap[functionName]) {
-        await extractArgumentsAndExecute(userInput, functionName, functionMap[functionName]);
+
+      console.log(`Executing function: ${functionName} with args:`, functionArgs);
+
+      // Check if the method exists on the instance
+      if (typeof calculatorInstance[functionName] === 'function') {
+        // Call the method on the class instance
+        const result = await executeFunction(functionName, functionArgs);
+        results.push({
+          status: 'success', 
+          actionName: action.action,
+          output: result
+        });
       } else {
-        console.log(`Function ${functionName} not found in functionMap`);
+        results.push({
+          status: 'error', 
+          message: `Function ${functionName} not found`
+        });
       }
     }
+
   } catch (error) {
-    console.error('Error in extractAndExecute:', error);
+    console.error('Error in runExecution:', error);
+    return {status: "error", message: `Error: ${error.message}`};
+  }
+
+  return {results: results, message: extractionResults.message};
+}
+
+async function executeFunction(functionName, functionArgs) {
+  try {
+    const args = Array.isArray(functionArgs) ? functionArgs : Object.values(functionArgs);
+    const result = calculatorInstance[functionName](...args);
+    console.log(`Result of ${functionName}:`, result);
+    return result;
+  } catch (error) {
+    console.error(`Error in executing ${functionName}:`, error);
+    throw error;
   }
 }
 
-async function extractArgumentsAndExecute(userInput, functionName,func_obj) {
-  const functionsArgsDict = buildFunctionsArgsDict(func_obj, functionName);
-  
-  console.log(`Extracting arguments for ${functionName}...`);
-  console.log("function arguments dict:", functionsArgsDict);
-
+async function processQuery(query) {
   try {
-    const extractArgumentsResponse = await axios.post('http://localhost:8000/extract_arguments', {
-      text: userInput,
-      functions_args_dict:  JSON.stringify(functionsArgsDict),
-    });
-
-    const extractedArguments = JSON.parse(extractArgumentsResponse.data);
-    console.log(`Arguments extraction response for ${functionName}:`, extractedArguments);
-
-     // Execute the function with the extracted arguments
-     const args = Object.values(extractedArguments[functionName]).map(arg => parseFloat(arg));
-     if (args.some(isNaN)) {
-       console.error(`Error in extractArgumentsAndExecute for ${functionName}: Invalid argument values`);
-     } else {
-       const result = func_obj(...args);
-       console.log(`Result of ${functionName}:`, result);
-     }
-   } catch (error) {
-     console.error(`Error in extractArgumentsAndExecute for ${functionName}:`, error);
-   }
- }
-
-// Example usage
-const userInputs = ['add 3 and 4','subtract 2 from 1','multiply 5 and 6','divide 8, 2'];
-
-for (const input of userInputs) {
-  extractAndExecute(input, functionMap);
+    console.log(`Processing query: "${query}"`);
+    const extractionResult = await runExtraction(query);
+    if (extractionResult) {
+      console.log('Extraction result:', extractionResult);
+      const executionResult = await runExecution(extractionResult);
+      console.log('Execution result:', executionResult);
+    } else {
+      console.log('No function extracted from the query.');
+    }
+  } catch (error) {
+    console.error('Error processing query:', error.message);
+  }
+  console.log('---');
 }
+
+// Sample queries
+const sampleQueries = [
+  "add 3, 5",
+  "subtract 10 from 20",
+  "multiply 4, 5, 6",
+  "divide 100 by 5",
+];
+
+// Run the demo
+async function runDemo() {
+  for (const query of sampleQueries) {
+    await processQuery(query);
+  }
+}
+
+runDemo();
