@@ -1,0 +1,356 @@
+{
+    "add": {
+        "description": "Add or sum a list of numbers",
+        "examples": ["20+50", "add 10, 30, 69", "sum of 1,3,4", "combine numbers", "find the total"],
+        "args": {
+            "values": {
+                "type": "List[int]",
+                "required": true
+            }
+        }
+    },
+    "subtract": {
+        "description": "Subtract two numbers",
+        "examples": ["10 - 5", "subtract 8 from 20", "what's 50 minus 15?", "deduct 5 from 10"],
+        "args": {
+            "a": {
+                "type": "int",
+                "required": true
+            },
+            "b": {
+                "type": "int",
+                "required": true
+            }
+        }
+    },
+    "multiply": {
+        "description": "Multiply a list of numbers",
+        "examples": ["multiply 2 and 3", "3*5*10", "product of 5 and 6", "calculate 4 times 6", "what's the product of 7, 2, 3?"],
+        "args": {
+            "values": {
+                "type": "List[int]",
+                "required": true
+            }
+        }
+    },
+    "divide": {
+        "description": "Divide one number by another",
+        "examples": ["10 divided by 2", "divide 100 by 5", "what's 50 / 2?", "split 36 by 9"],
+        "args": {
+            "a": {
+                "type": "float",
+                "required": true
+            },
+            "b": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "square_root": {
+        "description": "Calculate the square root of a number",
+        "examples": ["square root of 16", "find √25", "what is the root of 64?", "sqrt 81"],
+        "args": {
+            "a": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "percentage": {
+        "description": "Calculate the percentage of a part relative to the whole",
+        "examples": ["what percent of 50 is 5?", "percentage of 20 out of 100", "find % of 30 in 200", "calculate 45% of 300"],
+        "args": {
+            "part": {
+                "type": "float",
+                "required": true
+            },
+            "whole": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "sine": {
+        "description": "Calculate the sine of an angle (in radians)",
+        "examples": ["sine of 30 degrees", "sin(π/2)", "find sin(45)", "calculate sin of 90"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "cosine": {
+        "description": "Calculate the cosine of an angle (in radians)",
+        "examples": ["cosine of 60 degrees", "cos(π)", "what is cos(30)?", "find cosine of 0"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "tangent": {
+        "description": "Calculate the tangent of an angle (in radians)",
+        "examples": ["tangent of 45 degrees", "tan(π/4)", "find tan(30)", "what is the tangent of 60?"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "inverse_sine": {
+        "description": "Calculate the inverse sine (arcsin) of a value",
+        "examples": ["inverse sine of 0.5", "arcsin(1)", "what is the arcsin of 0?", "find inverse sin(0.707)"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "inverse_cosine": {
+        "description": "Calculate the inverse cosine (arccos) of a value",
+        "examples": ["inverse cosine of 1", "arccos(0)", "find inverse cosine of 0.5", "what's the arccos of 0.7?"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "inverse_tangent": {
+        "description": "Calculate the inverse tangent (arctan) of a value",
+        "examples": ["inverse tangent of 1", "arctan(0)", "what's arctan of 0.5?", "find the inverse tangent of 0.7"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "natural_log": {
+        "description": "Calculate the natural logarithm (ln) of a number",
+        "examples": ["natural log of 10", "find ln(100)", "what's the ln of 2?", "calculate ln(50)"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "common_log": {
+        "description": "Calculate the logarithm base 10 of a number",
+        "examples": ["log of 100", "find log(1000)", "what is log base 10 of 50?", "calculate the log of 1000"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "exponential": {
+        "description": "Calculate the exponential of a number",
+        "examples": ["exponential of 1", "e^2", "find the exp of 0", "calculate exp(5)"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "power": {
+        "description": "Calculate one number raised to the power of another",
+        "examples": ["2 raised to the power of 3", "what's 5^2?", "find 10 to the power of 4", "calculate 3^5"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            },
+            "y": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "factorial": {
+        "description": "Calculate the factorial of a number",
+        "examples": ["factorial of 5", "what's 5!?", "find factorial of 6", "calculate 4!"],
+        "args": {
+            "n": {
+                "type": "int",
+                "required": true
+            }
+        }
+    },
+    "sinh": {
+        "description": "Calculate the hyperbolic sine of a number",
+        "examples": ["sinh of 1", "what is sinh(0)?", "find the hyperbolic sine of 3", "calculate sinh of 2"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "cosh": {
+        "description": "Calculate the hyperbolic cosine of a number",
+        "examples": ["cosh of 2", "find cosh(0)", "what's the hyperbolic cosine of 1?", "calculate cosh(3)"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "tanh": {
+        "description": "Calculate the hyperbolic tangent of a number",
+        "examples": ["tanh of 0", "find tanh(1)", "what is tanh(2)?", "calculate the hyperbolic tangent of 0.5"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "degrees_to_radians": {
+        "description": "Convert degrees to radians",
+        "examples": ["convert 180 degrees to radians", "degrees to radians for 90", "find radians of 60 degrees", "what's 45 degrees in radians?"],
+        "args": {
+            "degrees": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "radians_to_degrees": {
+        "description": "Convert radians to degrees",
+        "examples": ["convert π radians to degrees", "radians to degrees for 1", "what's 3.14 radians in degrees?", "find degrees of 1.57 radians"],
+        "args": {
+            "radians": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "reciprocal": {
+        "description": "Calculate the reciprocal of a number",
+        "examples": ["reciprocal of 5", "find the reciprocal of 0.25", "what's the reciprocal of 10?", "calculate 1/7"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "modulus": {
+        "description": "Calculate the remainder of dividing one number by another",
+        "examples": ["modulus of 10 and 3", "find the remainder when 15 is divided by 4", "what's 9 % 2?", "calculate mod(25, 6)"],
+        "args": {
+            "a": {
+                "type": "float",
+                "required": true
+            },
+            "b": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "absolute_value": {
+        "description": "Find the absolute value of a number",
+        "examples": ["absolute value of -5", "what's |−3|?", "find abs(10)", "calculate the absolute of -100"],
+        "args": {
+            "x": {
+                "type": "float",
+                "required": true
+            }
+        }
+    },
+    "pi": {
+        "description": "Return the mathematical constant pi (π ≈ 3.14159)",
+        "examples": ["what's the value of pi?", "return π", "find pi constant", "give me the value of pi"],
+        "args": {}
+    },
+    "mean": {
+        "description": "Calculate the mean (average) of a list of numbers",
+        "examples": ["mean of 1, 2, 3", "average of 10, 15, 25", "find the mean of these numbers: 5, 10, 15", "calculate mean([2, 3, 6, 8])"],
+        "args": {
+            "data": {
+                "type": "List[float]",
+                "required": true
+            }
+        }
+    },
+    "median": {
+        "description": "Find the median of a list of numbers",
+        "examples": ["median of 1, 2, 3", "find the median of [5, 15, 25, 35]", "what's the median of 4, 8, 12, 16?", "calculate median([10, 2, 30, 4, 25])"],
+        "args": {
+            "data": {
+                "type": "List[float]",
+                "required": true
+            }
+        }
+    },
+    "standard_deviation": {
+        "description": "Calculate the standard deviation of a list of numbers",
+        "examples": ["standard deviation of [1, 2, 3, 4]", "find the std of 10, 12, 14, 15", "calculate standard deviation for these numbers: 2, 4, 6, 8, 10", "what's the standard deviation of 100, 50, 25, 75?"],
+        "args": {
+            "data": {
+                "type": "List[float]",
+                "required": true
+            }
+        }
+    },
+    "variance": {
+        "description": "Calculate the variance of a list of numbers",
+        "examples": ["variance of 1, 2, 3, 4", "find variance for [10, 20, 30, 40]", "calculate the variance of 5, 10, 15, 20", "what's the variance of 50, 60, 70, 80?"],
+        "args": {
+            "data": {
+                "type": "List[float]",
+                "required": true
+            }
+        }
+    },
+    "scientific_constant": {
+        "description": "Return the value of a specified scientific constant (e.g., Planck's constant, speed of light)",
+        "examples": ["what is Planck's constant?", "give me the speed of light", "return Avogadro's number", "find the gravitational constant"],
+        "args": {
+            "name": {
+                "type": "str",
+                "required": true
+            }
+        }
+    },
+    "combinations": {
+        "description": "Calculate the number of combinations of n items taken k at a time",
+        "examples": ["combinations of 5 taken 3 at a time", "how many ways can 4 items be chosen from 7?", "find C(6, 2)", "calculate combinations(10, 5)"],
+        "args": {
+            "n": {
+                "type": "int",
+                "required": true
+            },
+            "k": {
+                "type": "int",
+                "required": true
+            }
+        }
+    },
+    "permutations": {
+        "description": "Calculate the number of permutations of n items taken k at a time",
+        "examples": ["permutations of 4 taken 2 at a time", "how many ways can 3 items be arranged from 5?", "find P(6, 3)", "calculate permutations(7, 4)"],
+        "args": {
+            "n": {
+                "type": "int",
+                "required": true
+            },
+            "k": {
+                "type": "int",
+                "required": true
+            }
+        }
+    }
+}
+
