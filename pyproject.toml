@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "text_to_action"
-version = "1.0.5"
+version = "2.0.0"
 license = "MIT"
 description = "A system that translates natural language queries into programmatic actions"
 readme = "README.md"
@@ -15,7 +15,12 @@ classifiers = [
     "Programming Language :: Python",
     "Programming Language :: Python :: 3",
 ]
-keywords = ["text_to_action", "function calling", "natural language processing"]
+keywords = [
+    "text_to_action",
+    "function calling",
+    "natural language processing",
+    "automation",
+]
 
 [tool.poetry.dependencies]
 python = "^3.8"
@@ -33,3 +38,4 @@ sentence-transformers = "*"
 spacy = "*"
 torch = "*"
 transformers = "*"
+litellm = "*"
