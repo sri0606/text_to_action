@@ -67,12 +67,25 @@ class TextToAction:
         self.embeddings_store.load(action_embeddings_filepath)
         self.actions_module = load_module_from_path(action_implementation_filepath) if action_implementation_filepath is not None else None
 
-        with open(action_descriptions_filepath, 'r') as f:
-            self.args_template = json.load(f)
+        self.load_args_from_json(action_descriptions_filepath)
+        
         self.application_context = application_context
         self.filter_input = filter_input
         Config.set_verbose(verbose_output)
 
+    def load_args_from_json(self, action_descriptions_filepath):
+        with open(action_descriptions_filepath, 'r') as f:
+            data = json.load(f)
+
+        # Remove "examples" field from all function descriptions
+        for func_name, func_data in data.items():
+            if 'examples' in func_data:
+                del func_data['examples']
+
+        # Now self.args_template will contain the data without the "examples" field
+        self.args_template = data
+        return
+    
     @staticmethod
     def validate_file_paths(actions_folder):
         if actions_folder:
