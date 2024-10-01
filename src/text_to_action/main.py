@@ -259,6 +259,8 @@ class TextToAction:
             if not args:
                 args = self.args_template[action_name]["args"]
 
+            if len(args)==0:
+                return {}
             # Create the formatted string
             formatted_args = {key: value['type'] for key, value in args.items()}
             results = self.parameter_extractor.extract_parameters(query_text=query_text, 
