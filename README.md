@@ -6,9 +6,12 @@ Text-to-Action is a system that transaltes natural language commands to programm
 
 You can use this to automate tasks, either within your application or for external use, by letting users give natural language commands. For example, if you're building an image editing app, you can use TextToAction to understand what the user wants (like resizing or cropping an image) and even perform the action automatically.
 
+![](https://github.com/user-attachments/assets/59738161-34b9-4d4e-a6da-1f02b0d5b15a)
+
 ### How to use
 
 ```bash
+
 git clone https://github.com/sri0606/text_to_action.git
 or
 pip install text-to-action
@@ -151,10 +154,11 @@ Optionally, define the necessary functions and save them to a file. Infact, you 
 **Save the `descriptions.json`, `embeddings.h5` and `implementations.py` (optional) to a single folder.**
 
 ```python
-from text_to_action import TextToAction
+from text_to_action import TextToAction, LLMClient
 from dotenv import load_dotenv
 load_dotenv()
 
+llm_client = LLMClient(model="groq/llama3-70b-8192")
 # use the same embedding model, model source you used when creating the actions embeddings
 dispatcher = TextToAction(actions_folder = calculator_actions_folder, llm_client=llm_client,
                             verbose_output=True,application_context="Calculator", filter_input=True)
@@ -168,6 +172,16 @@ dispatcher = TextToAction(actions_folder = calculator_actions_folder, llm_client
 2. **Vector Store**: Stores embeddings of function descriptions and associated metadata for efficient similarity search.
 
 3. **Parameter Extractor**: Extracts function arguments from the input text using NER or LLM-based approaches.
+
+4. **LLM Client**: This is a client which process the llm-related tasks throughtout. If you want to send the conversation history to the LLM, you can use a ConversationManager.
+
+    ```python
+    from text_to_action import COnversationManager, LLMClient
+    
+    manager = ConversationManager(maxHistory=5)
+    llm_client = LLMClient(model="groq/llama3-70b-8192")
+    response = llm_client.get_response(query_text, conversation_manager=manager, include_history=True)
+    ```
 
 ## How it works
 
